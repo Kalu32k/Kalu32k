@@ -12,7 +12,8 @@ Building DnD tools
 
 <p align="center">
   <a href="https://github.com/Kalu32k"><img alt="github followers" src="https://img.shields.io/github/followers/Kalu32k?label=Follow&style=social"/></a>
-  <a href="https://github.com/Kalu32k/Kalu32k"><img alt="repo size" src="https://img.shields.io/github/repo-size/Kalu32k/Kalu32k"/></a>
+  <!-- REPO_COUNT: -->
+  <a href="https://github.com/Kalu32k"><img alt="repos" src="https://img.shields.io/badge/repos-0-informational"/></a>
   <a href="https://github.com/Kalu32k/Kalu32k/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/Kalu32k/Kalu32k?style=flat"/></a>
   <a href="https://komarev.com/"><img alt="profile views" src="https://komarev.com/ghpvc/?username=Kalu32k&color=brightgreen"/></a>
 </p>

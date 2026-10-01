@@ -1,0 +1,56 @@
+name: Update README with private-aware stats
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install deps
+        run: |
+          npm init -y
+          npm i node-fetch@2
+
+      - name: Generate stats and update README
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          node -e "(async()=>{const fs=require('fs');const fetch=require('node-fetch');const token=process.env.GH_PAT;const headers={'User-Agent':'gh-action'}; if(token) headers['Authorization']='token '+token; const perPage=100; let page=1; let repos=[]; while(true){ const url=`https://api.github.com/`+(token?`user/repos`:`users/Kalu32k/repos`)+`?per_page=${perPage}&page=${page}&type=all`; const res=await fetch(url,{headers}); if(!res.ok){ console.error('GitHub API error',res.status); break; } const batch=await res.json(); if(!Array.isArray(batch)) break; repos=repos.concat(batch); if(batch.length<perPage) break; page++; } const totalRepos=repos.length; const privateCount=repos.filter(r=>r.private).length; const ts=new Date().toISOString(); let readme=fs.readFileSync('README.md','utf8'); // Update repo count marker
+          const repoMarker='<!-- REPO_COUNT:';
+          const repoBadge=`![repos](${ 'https://img.shields.io/badge/repos-'+totalRepos+'-informational' })`;
+          if(readme.includes(repoMarker)){
+            readme=readme.replace(/<!-- REPO_COUNT:[\s\S]*?-->/,'<!-- REPO_COUNT: '+ts+' total='+totalRepos+' private='+privateCount+' -->\n'+repoBadge);
+          } else {
+            readme = readme.replace('<!-- REPO_COUNT: -->', '<!-- REPO_COUNT: '+ts+' total='+totalRepos+' private='+privateCount+' -->\n'+repoBadge);
+          }
+          // Update private stats marker
+          const privateMarker='<!-- PRIVATE_STATS:';
+          const privateBadge=`![private repos](${ 'https://img.shields.io/badge/private_repos-'+privateCount+'-informational' })`;
+          if(readme.includes(privateMarker)){
+            readme=readme.replace(/<!-- PRIVATE_STATS:[\s\S]*?-->/,'<!-- PRIVATE_STATS: '+ts+' count='+privateCount+' -->\n'+privateBadge);
+          } else {
+            readme += '\n<!-- PRIVATE_STATS: '+ts+' count='+privateCount+' -->\n'+privateBadge;
+          }
+          fs.writeFileSync('README.md',readme);
+          console.log('Updated README with stats',totalRepos,privateCount);
+          })()"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: update README private stats" || echo "no changes"
+          git push

@@ -7,6 +7,11 @@
 !/assets/
 !/assets/kalu32k.png
 
+# Keep workflows tracked
+!/.github/
+!/.github/workflows/
+!/.github/workflows/private-stats.yml
+
 # Local secret templates
 .secrets/
 .env
