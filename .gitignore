@@ -25,3 +25,7 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ignore kalu32k profile file and directory
+kalu32k_profile
+kalu32k_profile/
